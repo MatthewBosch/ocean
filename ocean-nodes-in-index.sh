@@ -134,3 +134,39 @@ EOL
 
   echo "已生成文件: $folder/docker-compose.yml"
 done
+
+# 确保用户输入 yes 或 no 之前不会跳过
+while true; do
+  read -p "是否执行生成的 yml 文件？(yes/no): " execute_choice
+  case $execute_choice in
+    [Yy]* )
+      # 检查系统上是否有 `docker-compose` 或 `docker compose`
+      if command -v docker-compose &> /dev/null; then
+        docker_cmd="docker-compose"
+      elif command -v docker &> /dev/null && docker compose version &> /dev/null; then
+        docker_cmd="docker compose"
+      else
+        echo "未检测到 docker-compose 或 docker compose，无法继续执行。"
+        exit 1
+      fi
+
+      for ((i = 0; i < yml_count; i++)); do
+        current_index=$((start_index + i))
+        folder="ocean$current_index"
+        cd $folder
+        echo "正在使用 $docker_cmd up -d 在文件夹: $folder"
+        $docker_cmd up -d
+        cd ..
+      done
+      echo "所有 yml 文件已执行完毕。"
+      break
+      ;;
+    [Nn]* )
+      echo "yml 文件已生成，但未执行。"
+      break
+      ;;
+    * )
+      echo "请输入 'yes' 或 'no'。"
+      ;;
+  esac
+done
