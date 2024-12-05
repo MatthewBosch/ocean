@@ -96,7 +96,7 @@ services:
       ARWEAVE_GATEWAY: 'https://arweave.net/'
       INTERFACES: '["HTTP","P2P"]'
       ALLOWED_ADMINS: '["$evm_address"]'
-      INDEXER_INTERVAL: ''
+      INDEXER_NETWORKS: '[]'
       DASHBOARD: 'true'
       HTTP_API_PORT: '$ocean_http_port'
       P2P_ENABLE_IPV4: 'true'
