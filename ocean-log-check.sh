@@ -3,10 +3,16 @@
 # 清屏
 clear
 
-echo "[INFO] 开始检查所有 ocean-node-* 容器的日志..."
+echo "[DEBUG] 开始检查所有 ocean-node-* 容器的日志..."
 
 # 获取所有 ocean-node-* 容器的名称
 ocean_node_containers=$(docker ps --format "{{.Names}}" | grep -E "^ocean-node-[0-9]+$")
+
+# 如果没有找到符合条件的容器，提示并退出
+if [[ -z "$ocean_node_containers" ]]; then
+  echo "[ERROR] 未找到符合条件的 ocean-node-* 容器，请检查容器命名或是否已运行。"
+  exit 1
+fi
 
 # 定义线程数量
 THREADS=4
@@ -25,8 +31,13 @@ process_container() {
   container_number=$(echo "$ocean_node_container" | grep -oE "[0-9]+$")
   typesense_container="typesense-$container_number"
 
+  echo "[DEBUG] 检查容器 $ocean_node_container 的日志..."
+  
   # 获取日志的最后一行
   last_log=$(docker logs --tail 1 "$ocean_node_container" 2>/dev/null)
+
+  # 输出调试日志内容
+  echo "[DEBUG] $ocean_node_container 日志最后一行: $last_log"
 
   # 检查日志是否包含关键字
   if echo "$last_log" | grep -q "republishStoredDDOS()"; then
