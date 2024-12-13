@@ -27,7 +27,7 @@ expand_ranges() {
 
 process_container() {
   index="$1"
-  folder="ocean-$index"
+  folder="ocean$index"
   yml_file="$folder/docker-compose.yml"
 
   if [[ -d "$folder" && -f "$yml_file" ]]; then
@@ -46,7 +46,7 @@ process_container() {
       exit 1
     fi
     cd - >/dev/null
-    echo "[INFO] 成功更新并重启容器：ocean-$index"
+    echo "[INFO] 成功更新并重启容器：ocean$index"
   else
     echo "[WARNING] 文件夹 $folder 或文件 $yml_file 不存在，跳过。"
   fi
