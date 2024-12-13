@@ -27,7 +27,7 @@ expand_ranges() {
 
 process_container() {
   index="$1"
-  folder="ocean$index"
+  folder="ocean$index" # 修正文件夹名称为 ocean$index
   yml_file="$folder/docker-compose.yml"
 
   if [[ -d "$folder" && -f "$yml_file" ]]; then
@@ -36,7 +36,7 @@ process_container() {
     typesense_container="typesense-$index"
     docker rm -f "$ocean_node_container" "$typesense_container" >/dev/null 2>&1
 
-    cd "$folder"
+    cd "$folder" || exit
     if command -v docker-compose &> /dev/null; then
       docker-compose up -d
     elif command -v docker &> /dev/null && docker compose version &> /dev/null; then
