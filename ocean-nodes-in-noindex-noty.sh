@@ -3,7 +3,7 @@
 # 清屏
 clear
 
-# 获取公网 IP 地址作为默认值
+# 自动获取公网 IP 地址
 default_ip=$(curl -4 -s https://ifconfig.me)
 if [[ -z "$default_ip" ]]; then
     echo "无法获取公网 IP 地址，请检查网络连接。"
@@ -126,14 +126,14 @@ while true; do
   read -p "是否执行生成的 yml 文件？(yes/no): " execute_choice
   case $execute_choice in
     [Yy]* )
-      # 检查 docker compose 或 docker-compose
-      if command -v docker compose &> /dev/null; then
-          docker_cmd="docker compose"
-      elif command -v docker-compose &> /dev/null; then
-          docker_cmd="docker-compose"
+      # 检查系统上是否有 docker-compose 或 docker compose
+      if command -v docker-compose &> /dev/null; then
+        docker_cmd="docker-compose"
+      elif command -v docker &> /dev/null && docker compose version &> /dev/null; then
+        docker_cmd="docker compose"
       else
-          echo "未检测到 docker compose 或 docker-compose，无法继续执行。"
-          exit 1
+        echo "未检测到 docker-compose 或 docker compose，无法继续执行。"
+        exit 1
       fi
 
       for ((i = 0; i < yml_count; i++)); do
