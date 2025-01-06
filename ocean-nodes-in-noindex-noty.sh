@@ -3,10 +3,10 @@
 # 清屏
 clear
 
-# 自动获取公网 IP 地址
-default_ip=$(curl -s https://ifconfig.me)
+# 自动获取公网 IPv4 地址
+default_ip=$(curl -4 -s https://ifconfig.me)
 if [[ -z "$default_ip" ]]; then
-    echo "无法获取公网 IP 地址，请检查网络连接。"
+    echo "无法获取公网 IPv4 地址，请检查网络连接。"
     exit 1
 fi
 
