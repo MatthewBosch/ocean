@@ -3,12 +3,13 @@
 # 清屏
 clear
 
-# 自动获取公网 IPv4 地址
-default_ip=$(curl -4 -s https://ifconfig.me)
-if [[ -z "$default_ip" ]]; then
+# 获取公网 IPv4 地址
+public_ipv4=$(curl -4 -s https://ifconfig.me)
+if [[ -z "$public_ipv4" ]]; then
     echo "无法获取公网 IPv4 地址，请检查网络连接。"
     exit 1
 fi
+echo "自动获取的公网 IP 地址为: $public_ipv4"
 
 # 询问需要生成的 yml 文件数量
 read -p "请输入需要生成的 yml 文件数量: " yml_count
@@ -16,12 +17,9 @@ read -p "请输入需要生成的 yml 文件数量: " yml_count
 # 询问容器编号的起始值
 read -p "请输入容器编号的起始值（例如，如果输入3，则容器将从 ocean-node-3 开始）: " start_index
 
-# 接收 P2P 绑定的 IP 地址
-read -p "请输入 P2P 绑定的 IP 地址（默认: $default_ip）: " ip_address
-ip_address=${ip_address:-$default_ip}  # 如果未输入，使用默认值
-
-# 输出确认
-echo "P2P 绑定的 IP 地址为: $ip_address"
+# 接收 IP 地址
+read -p "请输入 P2P 绑定的 IP 地址（默认: $public_ipv4）: " ip_address
+ip_address=${ip_address:-$public_ipv4}
 
 # 接收 Infura Project ID
 read -p "请输入 Infura Project ID (例如：5d9f50e145964c318dac0d6526278993): " infura_id
@@ -101,6 +99,10 @@ services:
       - "$p2p_ipv6_ws_port:$p2p_ipv6_ws_port"
     environment:
       PRIVATE_KEY: '${wallets[$((i + 1))]#*, Private Key: }'
+      RPCS: '{"1":{"rpc":"https://mainnet.infura.io/v3/$infura_id","chainId":1},"10":{"rpc":"https://optimism-mainnet.infura.io/v3/$infura_id","chainId":10}}'
+      INTERFACES: '["HTTP","P2P"]'
+      ALLOWED_ADMINS: '["$evm_address"]'
+      HTTP_API_PORT: '$ocean_http_port'
       P2P_ANNOUNCE_ADDRESSES: '["/ip4/$ip_address/tcp/$p2p_ipv4_tcp_port", "/ip4/$ip_address/ws/tcp/$p2p_ipv4_ws_port"]'
 EOL
 
@@ -112,22 +114,11 @@ while true; do
   read -p "是否执行生成的 yml 文件？(yes/no): " execute_choice
   case $execute_choice in
     [Yy]* )
-      # 检查系统上是否有 `docker-compose` 或 `docker compose`
-      if command -v docker-compose &> /dev/null; then
-        docker_cmd="docker-compose"
-      elif command -v docker &> /dev/null && docker compose version &> /dev/null; then
-        docker_cmd="docker compose"
-      else
-        echo "未检测到 docker-compose 或 docker compose，无法继续执行。"
-        exit 1
-      fi
-
       for ((i = 0; i < yml_count; i++)); do
         current_index=$((start_index + i))
         folder="ocean$current_index"
         cd $folder
-        echo "正在使用 $docker_cmd up -d 在文件夹: $folder"
-        $docker_cmd up -d
+        docker-compose up -d
         cd ..
       done
       echo "所有 yml 文件已执行完毕。"
