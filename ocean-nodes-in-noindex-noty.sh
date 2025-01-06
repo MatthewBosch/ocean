@@ -3,8 +3,12 @@
 # 清屏
 clear
 
-# 自动获取本机 IP 地址
-default_ip=$(hostname -I | awk '{print $1}')  # 获取本机的第一个 IP 地址
+# 自动获取公网 IP 地址
+default_ip=$(curl -s https://ifconfig.me)
+if [[ -z "$default_ip" ]]; then
+    echo "无法获取公网 IP 地址，请检查网络连接。"
+    exit 1
+fi
 
 # 询问需要生成的 yml 文件数量
 read -p "请输入需要生成的 yml 文件数量: " yml_count
@@ -97,7 +101,6 @@ services:
       - "$p2p_ipv6_ws_port:$p2p_ipv6_ws_port"
     environment:
       PRIVATE_KEY: '${wallets[$((i + 1))]#*, Private Key: }'
-      RPCS: '{"1":{"rpc":"https://mainnet.infura.io/v3/$infura_id","fallbackRPCs":["https://rpc.ankr.com/eth","https://1rpc.io/eth","https://eth.api.onfinality.io/public"],"chainId":1,"network":"mainnet","chunkSize":100},"10":{"rpc":"https://optimism-mainnet.infura.io/v3/$infura_id","fallbackRPCs":["https://optimism-mainnet.public.blastapi.io","https://rpc.ankr.com/optimism","https://optimism-rpc.publicnode.com"],"chainId":10,"network":"optimism","chunkSize":100},"137":{"rpc":"https://polygon-mainnet.infura.io/v3/$infura_id","fallbackRPCs":["https://polygon-mainnet.public.blastapi.io","https://1rpc.io/matic","https://rpc.ankr.com/polygon"],"chainId":137,"network":"polygon","chunkSize":100}}'
       P2P_ANNOUNCE_ADDRESSES: '["/ip4/$ip_address/tcp/$p2p_ipv4_tcp_port", "/ip4/$ip_address/ws/tcp/$p2p_ipv4_ws_port"]'
 EOL
 
