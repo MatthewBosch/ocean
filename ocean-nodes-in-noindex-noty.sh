@@ -20,8 +20,12 @@ read -p "请输入容器编号的起始值（例如，如果输入3，则容器�
 read -p "请输入 P2P 绑定的 IP 地址（默认: $default_ip）: " ip_address
 ip_address=${ip_address:-$default_ip}
 
-# 接收 Infura Project ID
-read -p "请输入 Infura Project ID (例如：5d9f50e145964c318dac0d6526278993): " infura_id
+# 设置默认 Infura Project ID
+default_infura_id="04e4e35535a040f68da4b4843bb32cd3"
+
+# 接收 Infura Project ID，默认值为 `default_infura_id`
+read -p "请输入 Infura Project ID (默认: $default_infura_id): " infura_id
+infura_id=${infura_id:-$default_infura_id}
 
 # 验证 Infura Project ID 格式 (32位字符)
 if [[ ! $infura_id =~ ^[a-zA-Z0-9]{32}$ ]]; then
