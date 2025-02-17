@@ -121,7 +121,7 @@ services:
       P2P_ipV6BindWsPort: '$p2p_ipv6_ws_port'
       P2P_ANNOUNCE_ADDRESSES: '["/ip4/$ip_address/tcp/$p2p_ipv4_tcp_port", "/ip4/$ip_address/ws/tcp/$p2p_ipv4_ws_port"]'
       P2P_connectionsMaxParallelDials: '200'
-      P2P_MAX_CONNECTIONS: '1000'
+      P2P_MAX_CONNECTIONS: '2000'
 EOL
 
   echo "已生成文件: $folder/docker-compose.yml"
